@@ -39,29 +39,21 @@ public class PantallaDeJuego {
 		framePrincipalDelJuego = new JFrame();
 		framePrincipalDelJuego.setBounds(100, 100, 929, 572);
 		framePrincipalDelJuego.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		contenedorBotones = new JPanel();
 		contenedorBotones.setBorder(new EmptyBorder(0, 8, 0, 0));
-
 		// DROPDOWN
-
 		comboBox = new JComboBox();
 		inicialiazarComboBox(comboBox);
 		framePrincipalDelJuego.getContentPane().setLayout(null);
 		cargarComboBoxAPantalla(comboBox);
-
 		// Panel de informacion del juego
 		inicializarPanelDeInformacionDelJuego();
-
 		inicializarLabelDeClick();
-
 		// contenedor de botones
 		contenedorBotones.setBounds(89, 102, 406, 361);
 		framePrincipalDelJuego.getContentPane().add(contenedorBotones);
 		contenedorBotones.setBackground(new Color(192, 192, 192));/* color gris claro */
-
 		btnCambiarTablero();
-
 	}
 
 	private void btnCambiarTablero() {
@@ -115,12 +107,12 @@ public class PantallaDeJuego {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				String itemSeleccionado = comboBox.getSelectedItem().toString();
 				if (esNumero(itemSeleccionado)) {
+					tablero = null;
 					Integer indice = casteoANum(itemSeleccionado);
 					clickText.setText("0");// resetea el contador si cambia el tamaio de la matriz
 					contenedorBotones.removeAll();
 					contenedorBotones.setLayout(new GridLayout(indice, indice, 2, 2)); // para ubicar los botones en un
 					tablero = new Tablero(indice);
-					//tablero.restartTablero(); //
 					dibujarTablero(tablero);
 					comboBox.setVisible(false);
 					contenedorBotones.repaint();
@@ -142,13 +134,13 @@ public class PantallaDeJuego {
 	/* metodos generales */
 
 	private void dibujarTablero(Tablero tablero) {
-		/*
-		 * recorrer el tablero creaarBoton()
-		 */
-
 		// Inicializo la matriz de botones
 		this.botones = new JButton[tablero.tamanio()][tablero.tamanio()];
 
+		asignarBotenes(tablero);
+	}
+
+	private void asignarBotenes(Tablero tablero) {
 		for (int fila = 0; fila < tablero.tamanio(); fila++) {
 			for (int col = 0; col < tablero.tamanio(); col++) {
 				// agrego los botones a la matriz
@@ -160,61 +152,56 @@ public class PantallaDeJuego {
 	private JButton crearBoton(int fila, int col) {
 		JButton btn = new JButton();
 		btn.setBorderPainted(false);
-		btn.setBackground(tablero.celdaEstaEncendida(fila, col) ? Color.GREEN : Color.black);
+		btn.setBackground(tablero.celdaEstaEncendida(fila, col) ? Color.black : Color.green);
 		contenedorBotones.add(btn);
-
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// Aqui puedes detectar cual boton fue presionado
-				// fila y col te dan la posicion del boton en la cuadricula
 				tablero.cambiarEstado(fila, col);
-				actualizarInformacion();
+				actualizarIntentos();
 				actualizarBotones();
 				if (tablero.estaResuelto()) {
-					informarEstadoDelJuego();
+					pantallaFinalDelJuego();
 				}
 			}
 		});
 		return btn;
 	}
 
-	private void informarEstadoDelJuego() {
+	private void pantallaFinalDelJuego() {
 		PantallaFinal pantallaFinal = new PantallaFinal();
 		pantallaFinal.setVisible(true);
 	}
 
 	// metodos nuevos
 	private void actualizarBotones() {
-		recorrerTablero();		
+		recorrerTablero();
 	}
 
 	private void recorrerTablero() {
 		for (int col = 0; col < tablero.tamanio(); col++) {
 			for (int fila = 0; fila < tablero.tamanio(); fila++) {
-				prenderApagarBotones(fila,col);
+				prenderApagarBotones(fila, col);
 			}
-		}		
+		}
 	}
 
-	// prende y apaga luz una luz dependiendo el estado del tablero
 	private void prenderApagarBotones(int fila, int col) {
-		if(tablero.celdaEstaEncendida(fila,col)) {
+		if (tablero.celdaEstaEncendida(fila, col)) {
 			botones[fila][col].setBackground(Color.black);
-		}else {
+		} else {
 			botones[fila][col].setBackground(Color.GREEN);
 		}
 	}
 
-	// cambia los click
-	private void actualizarInformacion() {
+	private void actualizarIntentos() {
 		// lo agrego
-			clickText.setText(String.valueOf(tablero.cantIntentos()));
+		clickText.setText(String.valueOf(tablero.cantIntentos()));
 	}
 
 	public void iniciar() {
 		this.framePrincipalDelJuego.setLocationRelativeTo(null);
 		framePrincipalDelJuego.setVisible(true);
 	}
-
 }
